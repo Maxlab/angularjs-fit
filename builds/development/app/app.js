@@ -5,11 +5,19 @@ $.material.init();
 
   "use strict";
 
-  angular.module('ngFit', [
-    'ngFit.main',
-    'ngFit.contact',
-    'ngFit.about'
-  ]);
+  angular
+    .module(
+      'ngFit', [
+      'ngFit.main',
+      'ngFit.contact',
+      'ngFit.about'
+    ])
+    .value('appVars',{
+      firebase_url: 'blala'
+    })
+  ;
+
+
 
 })();
 
