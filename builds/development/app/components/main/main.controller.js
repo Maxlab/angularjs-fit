@@ -1,7 +1,6 @@
 //best practice code style
 (function() {
 
-
   "use strict";
 
   angular.module('ngFit.main', ['ngRoute'])
@@ -9,8 +8,26 @@
     .controller('MainCtrl',MainCtrl)
     .factory('factoryPlusOne',factoryPlusOne) // can return object, a function, or any value
     .service('servicePlusOne',servicePlusOne) // always return object
+    .provider('plusOne',providerPlusOne)
   ;
-
+  // Provider return obj configure on config state
+  function providerPlusOne() {
+    // private
+    var one = 1;
+    var sum = 0;
+    return {
+      // public on config, else private
+      plusOne: function(num) {
+        sum = num + one;
+      },
+      $get: function() {
+        // public
+        return {
+          getSum: sum
+        }
+      }
+    }
+  }
   // Factory can be an object, a function reference, or any value at all
   function factoryPlusOne() {
     //private
@@ -35,26 +52,34 @@
     }
   }
 
-  configMain.$inject = ['$routeProvider'];
-  function configMain($routeProvider) {
+  configMain.$inject = ['$routeProvider','$logProvider','$provide','plusOneProvider'];
+  function configMain($routeProvider,$logProvider,$provide,plusOneProvider) {
+    $logProvider.debugEnabled(true);
     $routeProvider.when('/',{
       templateUrl: 'app/components/main/main.html',
       controller: 'MainCtrl',
       controllerAs: 'vm'
+    });
+    plusOneProvider.plusOne(2);
+    $provide.decorator('plusOne',function($delegate) {
+      $delegate.getSumPlusTwo = function() {
+        return this.getSum + 2;
+      }
+      return $delegate;
     })
   }
 
-  MainCtrl.$inject = ['$rootScope', 'appVars','servicePlusOne','factoryPlusOne'];
-  function MainCtrl($rootScope,appVars,servicePlusOne,factoryPlusOne) {
+  MainCtrl.$inject = ['serviceFirebase','$rootScope','$log','servicePlusOne','factoryPlusOne','plusOne'];
+  function MainCtrl(serviceFirebase,$rootScope,$log,servicePlusOne,factoryPlusOne,plusOne) {
     $rootScope.curPath = 'main';
     this.title = 'Main page - contrler';
-    this.url_fb = appVars.firebase_url;
+    this.users = serviceFirebase.getUsers();
 
-    var injectedFactoryPlusOne = factoryPlusOne;
-    var injectedServicePlusOne = servicePlusOne;
-    console.log(injectedFactoryPlusOne.plusOne(2));
-    console.log(injectedFactoryPlusOne.plusOne(2));
-    console.log(injectedServicePlusOne.plusOne(2));
+
+    $log.debug(servicePlusOne.plusOne(2),'servicePlusOne');
+    $log.debug(factoryPlusOne.plusOne(2),'factoryPlusOne');
+    $log.debug(plusOne.getSum, 'plusOne.getSum');
+    $log.debug(plusOne.getSumPlusTwo(), 'plusOne.getSumPlusTwo');
   }
 
 
