@@ -21,6 +21,15 @@
     $rootScope.curPath = 'about';
     this.title = 'About';
 
+    var a = 5;
+    var b = 1;
+    var c = b+++c;
+
+    function f(c) {
+
+    }
+    console.log(c);
+
   }
   
   

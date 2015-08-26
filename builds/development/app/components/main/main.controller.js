@@ -9,6 +9,16 @@
     .factory('factoryPlusOne',factoryPlusOne) // can return object, a function, or any value
     .service('servicePlusOne',servicePlusOne) // always return object
     .provider('plusOne',providerPlusOne)
+    .filter('revert',function() {
+      return function(input) {
+        input = input || [];
+        var out = [];
+        angular.forEach(input, function(value, key) {
+          out.push(value);
+        });
+        return out.reverse();
+      };
+    })
   ;
   // Provider return obj configure on config state
   function providerPlusOne() {
@@ -72,14 +82,23 @@
   MainCtrl.$inject = ['serviceFirebase','$rootScope','$log','servicePlusOne','factoryPlusOne','plusOne'];
   function MainCtrl(serviceFirebase,$rootScope,$log,servicePlusOne,factoryPlusOne,plusOne) {
     $rootScope.curPath = 'main';
-    this.title = 'Main page - contrler';
-    this.users = serviceFirebase.getUsers();
+    var self = this;
+    self.title = 'Main page - contrler';
+    self.users = serviceFirebase.getUsers();
 
+    self.user = {
+      name: null,
+      age: 0
+    };
 
+    self.addUser = function() {
+      serviceFirebase.addUser(self.user);
+    };
+/*
     $log.debug(servicePlusOne.plusOne(2),'servicePlusOne');
     $log.debug(factoryPlusOne.plusOne(2),'factoryPlusOne');
     $log.debug(plusOne.getSum, 'plusOne.getSum');
-    $log.debug(plusOne.getSumPlusTwo(), 'plusOne.getSumPlusTwo');
+    $log.debug(plusOne.getSumPlusTwo(), 'plusOne.getSumPlusTwo');*/
   }
 
 

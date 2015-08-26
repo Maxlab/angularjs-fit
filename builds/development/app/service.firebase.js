@@ -6,15 +6,17 @@
     .module('ngFit.service.firebase',['firebase'])
     .service('serviceFirebase', fire);
 
-  fire.$inject = ['$firebaseObject','$log','appVars'];
-  function fire($firebaseObject,$log,appVars) {
+  fire.$inject = ['$firebaseArray','$log','appVars'];
+  function fire($firebaseArray,$log,appVars) {
     var ref = new Firebase(appVars.firebase_url);
-    var users = $firebaseObject(ref.child('users'));
+    var usersRef = $firebaseArray(ref.child('users'));
 
     this.getUsers = function() {
-      return users;
+      return usersRef;
+    };
+
+    this.addUser = function(user) {
+      usersRef.$add(user);
     };
   }
-
-
 })();
